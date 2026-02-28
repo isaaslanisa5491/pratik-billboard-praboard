@@ -16,6 +16,7 @@ import {
   PrimaryButton,
   SuccessModal,
 } from '../../components';
+import PraboardLogo from '../../components/PraboardLogo';
 import { colors } from '../../theme/colors';
 import { useAuth } from '../../context/AuthContext';
 
@@ -87,9 +88,7 @@ export default function RegisterScreen({ navigation }) {
       >
         <ScrollView showsVerticalScrollIndicator={false}>
           <LinearGradient colors={['#FF4B4B', '#FF6B6B']} style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logo}>P</Text>
-            </View>
+            <PraboardLogo size={88} variant="onGradient" />
           </LinearGradient>
 
           <View style={styles.content}>
@@ -181,19 +180,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-  },
-  logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: colors.primary,
   },
   content: {
     padding: 24,

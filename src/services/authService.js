@@ -10,7 +10,7 @@ export async function signUp({ email, password, fullName, phone }) {
     password,
     options: {
       data: { full_name: fullName, phone },
-      emailRedirectTo: 'https://pratik-billboard-praboard-topaz.vercel.app/',
+      emailRedirectTo: 'https://pratik-billboard-praboard.vercel.app/',
     },
   });
   if (error) throw error;
@@ -43,7 +43,7 @@ export async function signOut() {
  */
 export async function resetPassword(email) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://pratik-billboard-praboard-topaz.vercel.app/?type=recovery',
+    redirectTo: 'https://pratik-billboard-praboard.vercel.app/?type=recovery',
   });
   if (error) throw error;
 }

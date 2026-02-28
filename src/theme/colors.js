@@ -28,4 +28,23 @@ export const colors = {
     800: '#262626',
     900: '#171717',
   },
+
+  // Çevreci tema
+  eco: {
+    forest: '#0B3D2E',
+    emerald: '#1B8A4A',
+    leaf: '#27AE60',
+    mint: '#E8F5E9',
+    sage: '#A8D5BA',
+    darkGreen: '#0A2E1C',
+  },
+
+  // Glassmorphism
+  glass: {
+    light: 'rgba(255, 255, 255, 0.08)',
+    border: 'rgba(255, 255, 255, 0.15)',
+    medium: 'rgba(255, 255, 255, 0.12)',
+    strong: 'rgba(255, 255, 255, 0.20)',
+    surface: 'rgba(255, 255, 255, 0.85)',
+  },
 };

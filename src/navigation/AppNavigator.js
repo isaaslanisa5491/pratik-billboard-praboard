@@ -5,12 +5,14 @@ import BottomTabBar from '../components/BottomTabBar';
 import CreateActionModal from '../components/CreateActionModal';
 
 // Screens
+import LandingPage from '../screens/Landing/LandingPage';
 import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import UsernameSelectScreen from '../screens/Auth/UsernameSelectScreen';
 import ForgotPasswordScreen from '../screens/Auth/ForgotPasswordScreen';
 import ResetPasswordScreen from '../screens/Auth/ResetPasswordScreen';
+import EmailVerifiedScreen from '../screens/Auth/EmailVerifiedScreen';
 import HomeScreen from '../screens/Home/HomeScreen';
 import LocationSelectScreen from '../screens/Location/LocationSelectScreen';
 import FilterScreen from '../screens/Filter/FilterScreen';
@@ -29,7 +31,7 @@ const MAIN_TABS = ['HomeTab', 'Panels', 'Notifications', 'ProfileTab'];
 export default function AppNavigator({ navigation }) {
   const [activeTab, setActiveTab] = useState('HomeTab');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const currentRoute = navigation.currentRoute.name;
+  const currentRoute = navigation.currentRoute?.name;
 
   const isMainScreen = MAIN_TABS.includes(currentRoute);
 
@@ -61,12 +63,14 @@ export default function AppNavigator({ navigation }) {
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       );
+      case 'Landing': return <LandingPage navigation={navigation} />;
       case 'Onboarding': return <OnboardingScreen navigation={navigation} />;
       case 'Register': return <RegisterScreen navigation={navigation} />;
       case 'Login': return <LoginScreen navigation={navigation} />;
       case 'UsernameSelect': return <UsernameSelectScreen navigation={navigation} />;
       case 'ForgotPassword': return <ForgotPasswordScreen navigation={navigation} />;
       case 'ResetPassword': return <ResetPasswordScreen navigation={navigation} />;
+      case 'EmailVerified': return <EmailVerifiedScreen navigation={navigation} />;
       case 'LocationSelect': return <LocationSelectScreen navigation={navigation} />;
       case 'Filter': return <FilterScreen navigation={navigation} />;
       case 'AdUpload': return <AdUploadScreen navigation={navigation} />;
@@ -78,9 +82,11 @@ export default function AppNavigator({ navigation }) {
     }
   };
 
+  const isLanding = currentRoute === 'Landing';
+
   return (
-    <View style={styles.outerContainer}>
-      <View style={styles.container}>
+    <View style={[styles.outerContainer, isLanding && { backgroundColor: '#F7FAF8' }]}>
+      <View style={[styles.container, isLanding && styles.containerFull]}>
         <View style={styles.screenContainer}>
           {renderScreen()}
         </View>
@@ -116,11 +122,10 @@ const styles = StyleSheet.create({
     width: '100%',
     ...(Platform.OS === 'web' ? { maxWidth: 480 } : {}),
   },
+  containerFull: {
+    ...(Platform.OS === 'web' ? { maxWidth: '100%' } : {}),
+  },
   screenContainer: {
     flex: 1,
-  },
-  emptyScreen: {
-    flex: 1,
-    backgroundColor: colors.background,
   },
 });

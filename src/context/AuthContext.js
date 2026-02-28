@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import * as authService from '../services/authService';
 import * as userService from '../services/userService';
+import { initialAuthType } from '../config/supabase';
 
 const AuthContext = createContext(null);
 
@@ -9,6 +10,7 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);  // profiles tablosu
   const [loading, setLoading] = useState(true);  // ilk yükleme
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   // Profili çek
   const fetchProfile = useCallback(async (userId) => {
@@ -48,6 +50,10 @@ export function AuthProvider({ children }) {
         setIsPasswordRecovery(true);
         setUser(session.user);
         return;
+      }
+      if (event === 'SIGNED_IN' && initialAuthType === 'signup') {
+        // Email doğrulama linkinden geldi
+        setIsEmailVerified(true);
       }
       if (session?.user) {
         setUser(session.user);
@@ -120,6 +126,11 @@ export function AuthProvider({ children }) {
     await fetchProfile(user.id);
   }, [user, fetchProfile]);
 
+  // Email doğrulama sayfasını temizle (karşılama sayfasından çıkarken)
+  const clearEmailVerified = useCallback(() => {
+    setIsEmailVerified(false);
+  }, []);
+
   const value = {
     user,
     profile,
@@ -128,6 +139,7 @@ export function AuthProvider({ children }) {
     hasUsername: !!profile?.username,
     isAdmin: profile?.role === 'admin',
     isPasswordRecovery,
+    isEmailVerified,
     signUp,
     signIn,
     signOut,
@@ -136,6 +148,7 @@ export function AuthProvider({ children }) {
     updateProfile,
     setUsername,
     refreshProfile,
+    clearEmailVerified,
   };
 
   return (
