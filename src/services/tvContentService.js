@@ -173,13 +173,21 @@ async function uploadMediaToStorage(mediaUri, contentId, mediaType) {
     if (mediaUri.startsWith('http://') || mediaUri.startsWith('https://')) {
       return mediaUri;
     }
-    if (mediaUri.startsWith('data:')) {
-      return mediaUri;
-    }
 
     const isVideo = mediaType === 'video';
-    const ext = isVideo ? 'mp4' : 'jpg';
-    const contentType = isVideo ? 'video/mp4' : 'image/jpeg';
+    let ext = isVideo ? 'mp4' : 'jpg';
+    let contentType = isVideo ? 'video/mp4' : 'image/jpeg';
+
+    // base64 data URI'den MIME type belirle
+    if (mediaUri.startsWith('data:')) {
+      const mimeMatch = mediaUri.match(/^data:([^;]+);/);
+      if (mimeMatch) {
+        contentType = mimeMatch[1];
+        if (contentType === 'image/png') ext = 'png';
+        else if (contentType === 'image/webp') ext = 'webp';
+        else if (contentType === 'image/gif') ext = 'gif';
+      }
+    }
 
     const response = await fetch(mediaUri);
     const blob = await response.blob();

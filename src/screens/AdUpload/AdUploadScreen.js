@@ -45,24 +45,23 @@ const AdUploadScreen = ({ navigation }) => {
   const [editingDateIndex, setEditingDateIndex] = useState(null);
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 0.7,
-      base64: true,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [16, 9],
+        quality: 0.5,
+      });
 
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const asset = result.assets[0];
-      setMediaType('image');
-      setVideoThumbnail(null);
-      if (asset.base64) {
-        const mimeType = asset.mimeType || 'image/jpeg';
-        setSelectedMedia(`data:${mimeType};base64,${asset.base64}`);
-      } else {
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0];
+        setMediaType('image');
+        setVideoThumbnail(null);
+        // URI kullan (base64 yerine) - Storage'a yukleme orderService'de yapilacak
         setSelectedMedia(asset.uri);
       }
+    } catch (e) {
+      Alert.alert('Hata', 'Görsel seçilirken bir sorun oluştu. Lütfen tekrar deneyin.');
     }
   };
 

@@ -1,6 +1,56 @@
 import { supabase } from '../config/supabase';
 
 /**
+ * Gorsel veya videoyu Supabase Storage'a yukle ve public URL'ini dondur.
+ * base64 data URI, blob URI veya file URI destekler.
+ * Zaten http(s) URL ise dogrudan dondurur.
+ */
+async function uploadOrderMedia(mediaUri, orderId, mediaType) {
+  try {
+    if (!mediaUri) return null;
+    if (mediaUri.startsWith('http://') || mediaUri.startsWith('https://')) {
+      return mediaUri;
+    }
+
+    const isVideo = mediaType === 'video';
+    let ext = isVideo ? 'mp4' : 'jpg';
+    let contentType = isVideo ? 'video/mp4' : 'image/jpeg';
+
+    if (mediaUri.startsWith('data:')) {
+      const mimeMatch = mediaUri.match(/^data:([^;]+);/);
+      if (mimeMatch) {
+        contentType = mimeMatch[1];
+        if (contentType === 'image/png') ext = 'png';
+        else if (contentType === 'image/webp') ext = 'webp';
+        else if (contentType === 'image/gif') ext = 'gif';
+      }
+    }
+
+    const response = await fetch(mediaUri);
+    const blob = await response.blob();
+    const filePath = `orders/${orderId}.${ext}`;
+
+    const { error } = await supabase.storage
+      .from('tv-content')
+      .upload(filePath, blob, { contentType, upsert: true });
+
+    if (error) {
+      console.warn('Order medya yukleme hatasi:', error.message);
+      return null;
+    }
+
+    const { data } = supabase.storage
+      .from('tv-content')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  } catch (error) {
+    console.warn('Order medya yukleme hatasi:', error);
+    return null;
+  }
+}
+
+/**
  * Supabase satir → uygulama formati
  */
 function mapOrderRow(row) {
@@ -63,13 +113,23 @@ export async function fetchUserOrders(userId) {
  */
 export async function createOrder(orderData) {
   const id = `ORD-${Date.now()}`;
+  const mediaType = orderData.mediaType || 'image';
+
+  // Gorseli/videoyu Storage'a yukle, base64'u veritabanina yazmaktan kacin
+  let adImageUrl = orderData.adImage;
+  if (orderData.adImage && !orderData.adImage.startsWith('http')) {
+    const uploaded = await uploadOrderMedia(orderData.adImage, id, mediaType);
+    if (uploaded) {
+      adImageUrl = uploaded;
+    }
+  }
 
   const row = {
     id,
     user_id: orderData.userId || null,
     ad_title: orderData.adTitle,
-    ad_image: orderData.adImage,
-    media_type: orderData.mediaType || 'image',
+    ad_image: adImageUrl,
+    media_type: mediaType,
     panel_id: orderData.panel?.id || null,
     panel_name: orderData.panel?.name || null,
     panel_location: orderData.panel?.location || null,
